@@ -1,2 +1,2 @@
 # rtt-component-template
-This is an empty template for a RTT component.
+This is an extended template with some basic port declaration and initialization as example.

@@ -13,7 +13,7 @@
 #define JOINT_NAMES_MAPPING_LOOKUP( it, memberDict, remoteDict, jointName ) {it = remoteDict.find(#jointName); if (it != remoteDict.end()) { memberDict.jointName = it->second; } it = remoteDict.end(); }
 
 
-RttComponent::RttComponent(std::string const & name) : cogimon::RTTJointAwareTaskContext(name) {
+ExampleLeftArm::ExampleLeftArm(std::string const & name) : cogimon::RTTJointAwareTaskContext(name) {
     // constructor:
     joint_position_left_arm_command = rstrt::kinematics::JointAngles(COMAN_LEFT_ARM_DOF_SIZE);
     joint_position_left_arm_command.angles.setZero();
@@ -27,7 +27,7 @@ RttComponent::RttComponent(std::string const & name) : cogimon::RTTJointAwareTas
     addProperty("trajectory_magnitude", magnitude).doc("Magnitude of sinusoidal trajectory");
 }
 
-bool RttComponent::configureHook() {
+bool ExampleLeftArm::configureHook() {
     // intializations and object creations go here. Each component should run this before being able to run
     if (!joint_position_left_arm_output_port.connected())
         return false;
@@ -35,7 +35,7 @@ bool RttComponent::configureHook() {
         return true;
 }
 
-bool RttComponent::startHook() {
+bool ExampleLeftArm::startHook() {
     // this method starts the component
 
     // e.g., setting home configuration:
@@ -45,7 +45,7 @@ bool RttComponent::startHook() {
     return true;
 }
 
-void RttComponent::updateHook() {
+void ExampleLeftArm::updateHook() {
     // this is the actual body of a component. it is called on each cycle
     for(int i=0; i<COMAN_LEFT_ARM_DOF_SIZE; ++i)
         joint_position_left_arm_command.angles(i) = magnitude*sin(getSimulationTime());
@@ -53,15 +53,15 @@ void RttComponent::updateHook() {
     joint_position_left_arm_output_port.write(joint_position_left_arm_command);
 }
 
-void RttComponent::stopHook() {
+void ExampleLeftArm::stopHook() {
     // stops the component (update hook wont be  called anymore)
 }
 
-void RttComponent::cleanupHook() {
+void ExampleLeftArm::cleanupHook() {
     // cleaning the component data
 }
 
-void RttComponent::retrieveJointMappingsHook(const std::string &port_name, const std::map<std::string, int> &mapping) {
+void ExampleLeftArm::retrieveJointMappingsHook(const std::string &port_name, const std::map<std::string, int> &mapping) {
     if (port_name == "JointPositionOutputPort_left_arm") {
         std::map<std::string, int>::const_iterator it;
         JOINT_NAMES_MAPPING_LOOKUP(it, comanLeftArm, mapping, LShSag);
@@ -76,13 +76,13 @@ void RttComponent::retrieveJointMappingsHook(const std::string &port_name, const
     }
 }
 
-double RttComponent::getSimulationTime() {
+double ExampleLeftArm::getSimulationTime() {
     return 1E-9 * RTT::os::TimeService::ticks2nsecs(RTT::os::TimeService::Instance()->getTicks());
 }
 
-void RttComponent::processJointMappingsHook(){
+void ExampleLeftArm::processJointMappingsHook(){
 
 }
 
 // This macro, as you can see, creates the component. Every component should have this!
-ORO_CREATE_COMPONENT_LIBRARY()ORO_LIST_COMPONENT_TYPE(RttComponent)
+ORO_CREATE_COMPONENT_LIBRARY()ORO_LIST_COMPONENT_TYPE(ExampleLeftArm)

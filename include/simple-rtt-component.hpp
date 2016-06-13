@@ -20,9 +20,9 @@
 
 #define COMAN_LEFT_ARM_DOF_SIZE 7
 
-class RttComponent: public cogimon::RTTJointAwareTaskContext {
+class ExampleLeftArm: public cogimon::RTTJointAwareTaskContext {
 public:
-    RttComponent(std::string const & name);
+    ExampleLeftArm(std::string const & name);
 
     void retrieveJointMappingsHook(std::string const& port_name, std::map<std::string, int> const& mapping);
     void processJointMappingsHook();

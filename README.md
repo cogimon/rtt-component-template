@@ -1,2 +1,2 @@
 # rtt-component-template
-Template for bare RTT component
+This is an empty template for a RTT component.

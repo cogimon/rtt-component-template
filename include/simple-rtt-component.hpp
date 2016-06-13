@@ -10,6 +10,9 @@
 
 // RTT header files. Might missing some or some be unused
 #include <rtt/RTT.hpp>
+// For datatypes:
+#include <rst-rt/kinematics/JointAngles.hpp>
+
 #include <string>
 
 #define ROBOT_DOF_SIZE 7
@@ -27,7 +30,21 @@ public:
     void cleanupHook();
 
 private:
-	// Declare ports and their datatypes
+    // To sample ports
+    //OutputPorts publish data.
+    RTT::OutputPort<rstrt::kinematics::JointAngles> JntPos_outPort;
+
+    //InputPorts read data.
+    RTT::InputPort<rstrt::kinematics::JointAngles> JntPos_InPort;
+
+    //InputPorts flow:
+    RTT::FlowStatus JntPos_InFlow;
+
+    //Hold the read[from port] value
+    rstrt::kinematics::JointAngles currJntPos;
+
+    //Hold the write[to port] value
+    rstrt::kinematics::JointAngles outJntPos;
 
 };
 

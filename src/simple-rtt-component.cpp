@@ -9,7 +9,11 @@
 // needed for the macro at the end of this file:
 #include <rtt/Component.hpp>
 
-RttComponent::RttComponent(std::string const & name) : RTT::TaskContext(name) {
+// This macro is needed for joint mappings
+#define JOINT_NAMES_MAPPING_LOOKUP( it, memberDict, remoteDict, jointName ) {it = remoteDict.find(#jointName); if (it != remoteDict.end()) { memberDict.jointName = it->second; } it = remoteDict.end(); }
+
+
+RttComponent::RttComponent(std::string const & name) : cogimon::RTTJointAwareTaskContext(name) {
     // constructor:
     
 }
@@ -34,6 +38,34 @@ void RttComponent::stopHook() {
 
 void RttComponent::cleanupHook() {
     // cleaning the component data
+}
+
+void RttComponent::retrieveJointMappingsHook(const std::string &port_name, const std::map<std::string, int> &mapping) {
+    if (port_name == "cmdJntPos") {
+        std::map<std::string, int>::const_iterator it;
+        JOINT_NAMES_MAPPING_LOOKUP(it, comanLeftArm, mapping, LShSag);
+        JOINT_NAMES_MAPPING_LOOKUP(it, comanLeftArm, mapping, LShLat);
+        JOINT_NAMES_MAPPING_LOOKUP(it, comanLeftArm, mapping, LShYaw);
+        JOINT_NAMES_MAPPING_LOOKUP(it, comanLeftArm, mapping, LElbj);
+        JOINT_NAMES_MAPPING_LOOKUP(it, comanLeftArm, mapping, LForearmPlate);
+        JOINT_NAMES_MAPPING_LOOKUP(it, comanLeftArm, mapping, LWrj1);
+        JOINT_NAMES_MAPPING_LOOKUP(it, comanLeftArm, mapping, LWrj2);
+    } else if (port_name == "cmdJntPosRIGHT") {
+        std::map<std::string, int>::const_iterator it;
+        JOINT_NAMES_MAPPING_LOOKUP(it, comanRightArm, mapping, RShSag);
+        JOINT_NAMES_MAPPING_LOOKUP(it, comanRightArm, mapping, RShLat);
+        JOINT_NAMES_MAPPING_LOOKUP(it, comanRightArm, mapping, RShYaw);
+        JOINT_NAMES_MAPPING_LOOKUP(it, comanRightArm, mapping, RElbj);
+        JOINT_NAMES_MAPPING_LOOKUP(it, comanRightArm, mapping, RForearmPlate);
+        JOINT_NAMES_MAPPING_LOOKUP(it, comanRightArm, mapping, RWrj1);
+        JOINT_NAMES_MAPPING_LOOKUP(it, comanRightArm, mapping, RWrj2);
+    } else {
+        // handle the exception
+    }
+}
+
+void RttComponent::processJointMappingsHook(){
+
 }
 
 // This macro, as you can see, creates the component. Every component should have this!

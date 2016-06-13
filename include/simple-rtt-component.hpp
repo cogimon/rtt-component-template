@@ -9,14 +9,20 @@
 #define SIMPLERTTCOMPONENT_HPP
 
 // RTT header files. Might missing some or some be unused
-#include <rtt/RTT.hpp>
 #include <string>
+#include <rtt-core-extensions/rtt-jointaware-taskcontext.hpp>
+
+// Joint names for convenience
+#include "JointNameMappingsComanArms.hpp"
 
 #define ROBOT_DOF_SIZE 7
 
-class RttComponent: public RTT::TaskContext {
+class RttComponent: public cogimon::RTTJointAwareTaskContext {
 public:
     RttComponent(std::string const & name);
+
+    void retrieveJointMappingsHook(std::string const& port_name, std::map<std::string, int> const& mapping);
+    void processJointMappingsHook();
 
     // RTT::TaskContext methods that are needed for any standard component and
     // should be implemented by user
@@ -27,7 +33,11 @@ public:
     void cleanupHook();
 
 private:
-	// Declare ports and their datatypes
+    JointNamesLeftArm  comanLeftArm;
+    JointNamesRightArm comanRightArm;
+
+    // Declare ports and their datatypes
+
 
 };
 

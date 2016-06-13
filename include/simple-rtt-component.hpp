@@ -18,7 +18,7 @@
 // Joint names for convenience
 #include "JointNameMappingsComanArms.hpp"
 
-#define COMAN_RIGHT_ARM_DOF_SIZE 7
+#define COMAN_LEFT_ARM_DOF_SIZE 7
 
 class RttComponent: public cogimon::RTTJointAwareTaskContext {
 public:
@@ -37,13 +37,12 @@ public:
 
 private:
     JointNamesLeftArm  comanLeftArm;
-    JointNamesRightArm comanRightArm;
 
     // Declare ports and their datatypes
-    RTT::OutputPort<rstrt::kinematics::JointAngles> joint_position_right_arm_output_port;
+    RTT::OutputPort<rstrt::kinematics::JointAngles> joint_position_left_arm_output_port;
 
     // Actuall joint command to be sent over port:
-    rstrt::kinematics::JointAngles joint_position_right_arm_command;
+    rstrt::kinematics::JointAngles joint_position_left_arm_command;
 
     // helpers:
     double getSimulationTime();

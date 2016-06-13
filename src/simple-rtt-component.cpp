@@ -15,13 +15,13 @@
 
 RttComponent::RttComponent(std::string const & name) : cogimon::RTTJointAwareTaskContext(name) {
     // constructor:
-    joint_position_right_arm_command = rstrt::kinematics::JointAngles(COMAN_RIGHT_ARM_DOF_SIZE);
-    joint_position_right_arm_command.angles.setZero();
+    joint_position_left_arm_command = rstrt::kinematics::JointAngles(COMAN_LEFT_ARM_DOF_SIZE);
+    joint_position_left_arm_command.angles.setZero();
 
-    joint_position_right_arm_output_port.setName("JointPositionOutputPort_right_arm");
-    joint_position_right_arm_output_port.setDataSample(joint_position_right_arm_command);
+    joint_position_left_arm_output_port.setName("JointPositionOutputPort_left_arm");
+    joint_position_left_arm_output_port.setDataSample(joint_position_left_arm_command);
 
-    ports()->addPort(joint_position_right_arm_output_port).doc("Output port for sending right arm refrence joint values");
+    ports()->addPort(joint_position_left_arm_output_port).doc("Output port for sending right arm refrence joint values");
 
     magnitude = 1.0;
     addProperty("trajectory_magnitude", magnitude).doc("Magnitude of sinusoidal trajectory");
@@ -29,7 +29,7 @@ RttComponent::RttComponent(std::string const & name) : cogimon::RTTJointAwareTas
 
 bool RttComponent::configureHook() {
     // intializations and object creations go here. Each component should run this before being able to run
-    if (!joint_position_right_arm_output_port.connected())
+    if (!joint_position_left_arm_output_port.connected())
         return false;
     else
         return true;
@@ -37,15 +37,20 @@ bool RttComponent::configureHook() {
 
 bool RttComponent::startHook() {
     // this method starts the component
+
+    // e.g., setting home configuration:
+    joint_position_left_arm_command.angles(comanLeftArm.LElbj) = 0.5;
+    joint_position_left_arm_output_port.write(joint_position_left_arm_command);
+
     return true;
 }
 
 void RttComponent::updateHook() {
     // this is the actual body of a component. it is called on each cycle
-    for(int i=0; i<COMAN_RIGHT_ARM_DOF_SIZE; ++i)
-        joint_position_right_arm_command.angles(i) = magnitude*sin(getSimulationTime());
+    for(int i=0; i<COMAN_LEFT_ARM_DOF_SIZE; ++i)
+        joint_position_left_arm_command.angles(i) = magnitude*sin(getSimulationTime());
 
-    joint_position_right_arm_output_port.write(joint_position_right_arm_command);
+    joint_position_left_arm_output_port.write(joint_position_left_arm_command);
 }
 
 void RttComponent::stopHook() {
@@ -57,7 +62,7 @@ void RttComponent::cleanupHook() {
 }
 
 void RttComponent::retrieveJointMappingsHook(const std::string &port_name, const std::map<std::string, int> &mapping) {
-    if (port_name == "cmdJntPos") {
+    if (port_name == "JointPositionOutputPort_left_arm") {
         std::map<std::string, int>::const_iterator it;
         JOINT_NAMES_MAPPING_LOOKUP(it, comanLeftArm, mapping, LShSag);
         JOINT_NAMES_MAPPING_LOOKUP(it, comanLeftArm, mapping, LShLat);
@@ -66,15 +71,6 @@ void RttComponent::retrieveJointMappingsHook(const std::string &port_name, const
         JOINT_NAMES_MAPPING_LOOKUP(it, comanLeftArm, mapping, LForearmPlate);
         JOINT_NAMES_MAPPING_LOOKUP(it, comanLeftArm, mapping, LWrj1);
         JOINT_NAMES_MAPPING_LOOKUP(it, comanLeftArm, mapping, LWrj2);
-    } else if (port_name == "cmdJntPosRIGHT") {
-        std::map<std::string, int>::const_iterator it;
-        JOINT_NAMES_MAPPING_LOOKUP(it, comanRightArm, mapping, RShSag);
-        JOINT_NAMES_MAPPING_LOOKUP(it, comanRightArm, mapping, RShLat);
-        JOINT_NAMES_MAPPING_LOOKUP(it, comanRightArm, mapping, RShYaw);
-        JOINT_NAMES_MAPPING_LOOKUP(it, comanRightArm, mapping, RElbj);
-        JOINT_NAMES_MAPPING_LOOKUP(it, comanRightArm, mapping, RForearmPlate);
-        JOINT_NAMES_MAPPING_LOOKUP(it, comanRightArm, mapping, RWrj1);
-        JOINT_NAMES_MAPPING_LOOKUP(it, comanRightArm, mapping, RWrj2);
     } else {
         // handle the exception
     }

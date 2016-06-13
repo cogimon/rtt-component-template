@@ -15,12 +15,24 @@
 
 RttComponent::RttComponent(std::string const & name) : cogimon::RTTJointAwareTaskContext(name) {
     // constructor:
-    
+    joint_position_right_arm_command = rstrt::kinematics::JointAngles(COMAN_RIGHT_ARM_DOF_SIZE);
+    joint_position_right_arm_command.angles.setZero();
+
+    joint_position_right_arm_output_port.setName("JointPositionOutputPort_right_arm");
+    joint_position_right_arm_output_port.setDataSample(joint_position_right_arm_command);
+
+    ports()->addPort(joint_position_right_arm_output_port).doc("Output port for sending right arm refrence joint values");
+
+    magnitude = 1.0;
+    addProperty("trajectory_magnitude", magnitude).doc("Magnitude of sinusoidal trajectory");
 }
 
 bool RttComponent::configureHook() {
     // intializations and object creations go here. Each component should run this before being able to run
-    return true;
+    if (!joint_position_right_arm_output_port.connected())
+        return false;
+    else
+        return true;
 }
 
 bool RttComponent::startHook() {
@@ -30,6 +42,10 @@ bool RttComponent::startHook() {
 
 void RttComponent::updateHook() {
     // this is the actual body of a component. it is called on each cycle
+    for(int i=0; i<COMAN_RIGHT_ARM_DOF_SIZE; ++i)
+        joint_position_right_arm_command.angles(i) = magnitude*sin(getSimulationTime());
+
+    joint_position_right_arm_output_port.write(joint_position_right_arm_command);
 }
 
 void RttComponent::stopHook() {
@@ -62,6 +78,10 @@ void RttComponent::retrieveJointMappingsHook(const std::string &port_name, const
     } else {
         // handle the exception
     }
+}
+
+double RttComponent::getSimulationTime() {
+    return 1E-9 * RTT::os::TimeService::ticks2nsecs(RTT::os::TimeService::Instance()->getTicks());
 }
 
 void RttComponent::processJointMappingsHook(){

@@ -9,13 +9,16 @@
 #define SIMPLERTTCOMPONENT_HPP
 
 // RTT header files. Might missing some or some be unused
+#include <rtt/Port.hpp>
 #include <string>
 #include <rtt-core-extensions/rtt-jointaware-taskcontext.hpp>
 
+// Joint value datatype:
+#include <rst-rt/kinematics/JointAngles.hpp>
 // Joint names for convenience
 #include "JointNameMappingsComanArms.hpp"
 
-#define ROBOT_DOF_SIZE 7
+#define COMAN_RIGHT_ARM_DOF_SIZE 7
 
 class RttComponent: public cogimon::RTTJointAwareTaskContext {
 public:
@@ -37,8 +40,14 @@ private:
     JointNamesRightArm comanRightArm;
 
     // Declare ports and their datatypes
+    RTT::OutputPort<rstrt::kinematics::JointAngles> joint_position_right_arm_output_port;
 
+    // Actuall joint command to be sent over port:
+    rstrt::kinematics::JointAngles joint_position_right_arm_command;
 
+    // helpers:
+    double getSimulationTime();
+    double magnitude;
 };
 
 #endif // SIMPLERTTCOMPONENT_HPP

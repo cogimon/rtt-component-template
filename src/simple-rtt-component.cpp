@@ -9,9 +9,6 @@
 // needed for the macro at the end of this file:
 #include <rtt/Component.hpp>
 
-// This macro is needed for joint mappings
-#define JOINT_NAMES_MAPPING_LOOKUP( it, memberDict, remoteDict, jointName ) {it = remoteDict.find(#jointName); if (it != remoteDict.end()) { memberDict.jointName = it->second; } it = remoteDict.end(); }
-
 
 ExampleLeftArm::ExampleLeftArm(std::string const & name) : cogimon::RTTJointAwareTaskContext(name) {
     // constructor:
@@ -25,6 +22,7 @@ ExampleLeftArm::ExampleLeftArm(std::string const & name) : cogimon::RTTJointAwar
 
     magnitude = 1.0;
     addProperty("trajectory_magnitude", magnitude).doc("Magnitude of sinusoidal trajectory");
+
 }
 
 bool ExampleLeftArm::configureHook() {
@@ -37,9 +35,9 @@ bool ExampleLeftArm::configureHook() {
 
 bool ExampleLeftArm::startHook() {
     // this method starts the component
-
     // e.g., setting home configuration:
-    joint_position_left_arm_command.angles(comanLeftArm.LElbj) = 0.5;
+    std::cout<<"comanLeftArm.LElbj index is "<<comanLeftArm.LElbj<<std::endl;
+    joint_position_left_arm_command.angles(comanLeftArm.LElbj) = -0.5;
     joint_position_left_arm_output_port.write(joint_position_left_arm_command);
 
     return true;
@@ -50,7 +48,7 @@ void ExampleLeftArm::updateHook() {
     for(int i=0; i<COMAN_LEFT_ARM_DOF_SIZE; ++i)
         joint_position_left_arm_command.angles(i) = magnitude*sin(getSimulationTime());
 
-    joint_position_left_arm_output_port.write(joint_position_left_arm_command);
+    //joint_position_left_arm_output_port.write(joint_position_left_arm_command);
 }
 
 void ExampleLeftArm::stopHook() {
@@ -61,22 +59,38 @@ void ExampleLeftArm::cleanupHook() {
     // cleaning the component data
 }
 
-void ExampleLeftArm::retrieveJointMappingsHook(const std::string &port_name, const std::map<std::string, int> &mapping) {
+void ExampleLeftArm::retrieveJointMappingsHook(const std::string &port_name, const std::vector<std::pair<std::string, int>> &mapping) {
     if (port_name == "JointPositionOutputPort_left_arm") {
-        std::map<std::string, int>::const_iterator it;
-        JOINT_NAMES_MAPPING_LOOKUP(it, comanLeftArm, mapping, LShSag);
-        JOINT_NAMES_MAPPING_LOOKUP(it, comanLeftArm, mapping, LShLat);
-        JOINT_NAMES_MAPPING_LOOKUP(it, comanLeftArm, mapping, LShYaw);
-        JOINT_NAMES_MAPPING_LOOKUP(it, comanLeftArm, mapping, LElbj);
-        JOINT_NAMES_MAPPING_LOOKUP(it, comanLeftArm, mapping, LForearmPlate);
-        JOINT_NAMES_MAPPING_LOOKUP(it, comanLeftArm, mapping, LWrj1);
-        JOINT_NAMES_MAPPING_LOOKUP(it, comanLeftArm, mapping, LWrj2);
+        for(unsigned int i = 0; i < mapping.size(); ++i)
+        {
+            if(mapping[i].first == "LShSag")
+                comanLeftArm.LShSag = mapping[i].second;
+            if(mapping[i].first == "LShLat")
+                comanLeftArm.LShLat = mapping[i].second;
+            if(mapping[i].first == "LShYaw")
+                comanLeftArm.LShYaw = mapping[i].second;
+            if(mapping[i].first == "LElbj")
+                comanLeftArm.LElbj = mapping[i].second;
+            if(mapping[i].first == "LForearmPlate")
+                comanLeftArm.LForearmPlate = mapping[i].second;
+            if(mapping[i].first == "LWrj1")
+                comanLeftArm.LWrj1 = mapping[i].second;
+            if(mapping[i].first == "LWrj2")
+                comanLeftArm.LWrj2 = mapping[i].second;
+        }
+
+        std::cout<<"LShSag is "<<comanLeftArm.LShSag<<std::endl;
+        std::cout<<"LShLat is "<<comanLeftArm.LShLat<<std::endl;
+        std::cout<<"LShYaw is "<<comanLeftArm.LShYaw<<std::endl;
+        std::cout<<"LElbj is "<<comanLeftArm.LElbj<<std::endl;
+        std::cout<<"LForearmPlate is "<<comanLeftArm.LForearmPlate<<std::endl;
+        std::cout<<"LLWrj1 is "<<comanLeftArm.LWrj1<<std::endl;
+        std::cout<<"LLWrj2 is "<<comanLeftArm.LWrj2<<std::endl;
+
     } else {
         // handle the exception
     }
-    typedef std::map<std::string, int>::const_iterator iterator;
-    for (iterator it=mapping.begin(); it!=mapping.end(); ++it )
-        RTT::log(RTT::Info) << it->first<<"\t"<<it->second<<RTT::endlog();
+
 }
 
 double ExampleLeftArm::getSimulationTime() {

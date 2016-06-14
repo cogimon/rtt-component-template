@@ -5,6 +5,8 @@
 #
 cmake_minimum_required(VERSION 2.8.3)
  
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+
 #
 # This creates a standard cmake project. You may extend this file with
 # any cmake macro you see fit.

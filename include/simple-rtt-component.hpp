@@ -17,6 +17,7 @@
 #include <rst-rt/kinematics/JointAngles.hpp>
 // Joint names for convenience
 #include "JointNameMappingsComanArms.hpp"
+#include <unordered_map>
 
 #define COMAN_LEFT_ARM_DOF_SIZE 7
 
@@ -24,7 +25,7 @@ class ExampleLeftArm: public cogimon::RTTJointAwareTaskContext {
 public:
     ExampleLeftArm(std::string const & name);
 
-    void retrieveJointMappingsHook(std::string const& port_name, std::map<std::string, int> const& mapping);
+    void retrieveJointMappingsHook(std::string const& port_name, std::vector<std::pair<std::string, int>> const& mapping);
     void processJointMappingsHook();
 
     // RTT::TaskContext methods that are needed for any standard component and

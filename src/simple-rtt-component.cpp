@@ -74,6 +74,9 @@ void ExampleLeftArm::retrieveJointMappingsHook(const std::string &port_name, con
     } else {
         // handle the exception
     }
+    typedef std::map<std::string, int>::const_iterator iterator;
+    for (iterator it=mapping.begin(); it!=mapping.end(); ++it )
+        RTT::log(RTT::Info) << it->first<<"\t"<<it->second<<RTT::endlog();
 }
 
 double ExampleLeftArm::getSimulationTime() {
